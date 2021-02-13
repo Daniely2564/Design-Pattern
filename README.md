@@ -1,3 +1,3 @@
-# Design Pattern
+# Design Patterns
 
-Design pattern in javascript for the future reference.
+Design patterns in javascript for the future reference.
