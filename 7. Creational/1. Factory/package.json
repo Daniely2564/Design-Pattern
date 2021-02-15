@@ -1,0 +1,14 @@
+{
+  "name": "factory-study",
+  "version": "1.0.0",
+  "type":"module",
+  "description": "- Ability to decouple the creation of an object from one particular implementation.\r - Expose \"a surface area\" that is much smaller than that of a class.\r   - In general, a class can be extended or manipulated.\r   - Factory, by just being a function, offers fewer options to the user.\r     - robust and easier to understand\r - enforces encapsulation by leveraging closures.",
+  "main": "index.js",
+  "scripts": {
+    "start": "NODE_ENV=production node index.js 30210312211201111",
+    "dev": "node index.js 30210312211201111",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
