@@ -1,0 +1,12 @@
+{
+  "name": "revealing-constructor",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "**Definition** : How do we reveal some private functionality of an object only at the moment of the object's creation? This is particularly useful when we want to allow an object's internals to be manipulated only during its creation phase.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
