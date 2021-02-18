@@ -86,3 +86,19 @@ console.log(String.fromCharCode(immutable.readInt8(0)));
 
 immutable.write("Hello?");
 ```
+
+※ From the previous code, the executor function uses the **write()** function (which is part of the modifier methods) to write a string into the buffer.
+
+- The function could've used **fill()**, **writeInt8()**, **swap16()** or other method exposed in the _modifier_ object.
+- The codde we've seen also demonstrates how the **Immutable Buffer** instance exposes only the methods that don't mutate the buffer, such as **readInt8()**.
+
+### In the wild
+
+The **Revealing Constructor** pattern offers very strong guarantees and for this reason, it's mainly used in context where we need to provide foolproof encapsulation.
+
+- A perfect application of this pattern would be in components used by tons of developers that have to provide unopinionated interfaces and strict encapsulation.
+- We could also use in our application to improve readability and simplify code sharing with other people and teams.
+
+#### Example
+
+One of the popular examples of the Revealing Constructor patterns in the Javascript Promise class. When we create a new _Promise_ from scratch, its constructor accepts as input an _executor_ function that will receive **resolve()** and **reject()**
