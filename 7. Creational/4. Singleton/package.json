@@ -1,0 +1,12 @@
+{
+  "name": "singleton",
+  "version": "1.0.0",
+  "description": "Enforces the presence of only one instance of a class and centralize its access. There are few reasons for using a single instance across all the components of the application.",
+  "main": "index.js",
+  "type":"module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
