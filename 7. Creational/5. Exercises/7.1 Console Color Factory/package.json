@@ -1,0 +1,12 @@
+{
+  "name": "color-factory",
+  "version": "1.0.0",
+  "description": "Below you can find colors reference of text to command when running node.js application:",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
