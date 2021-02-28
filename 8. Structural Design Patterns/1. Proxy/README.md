@@ -140,12 +140,51 @@ The _safeCalculator_ object is a proxy for the original _calculator_ instance. T
 An alternative implementation of the proxy presented in the preceding code fragment might just use an object literal and a factory function.
 
 ```javascript
-function createSafeCalculator(calculator) {
+// Alternative implementation of the proxy
+export function createSafeCalculator(calculator) {
   return {
+    // proxied method
     divide() {
-      // aditional validation logic
-      const divisor;
+      // additional validation logic
+      const divisor = calculator.peekValue();
+      if (divisor === 0) {
+        throw Error("Division by 0");
+      }
+      // if valid delegates to the subject
+      return calculator.divide();
+    },
+    // delegated methods
+    putValue(value) {
+      return calculator.putValue();
+    },
+    getValue() {
+      return calculator.getValue();
+    },
+    peekValue() {
+      return calculator.peekValue();
+    },
+    clear() {
+      return calculator.clear();
+    },
+    multiply() {
+      return calculator.multiply();
     },
   };
 }
+```
+
+This implementation is simpler and more concise than the class-based one, but once again, it forces us to delegate all the methods to the subject explicitly.
+
+※ Having to delegate many methods for complex classes can be very tedious and might make it harder to implement these techniques. One way to create a proxy that delegates most of its methods is to use a library that generates all the methods for us, such as _delegates_ ([nodejsdp.link/delegates](nodejsdp.link/delegates)).
+
+※ A more modern and native alternative is to use the _Proxy_ object, which we will discuss later in this chapter.
+
+## Object augmentation
+
+**Object augmentation** (or **monkey patching**) is the simplest and the most common way of proxying just a few methods of an object. It involes modifying the subject directly by replacing a method with its proxied implementation.
+
+In the context of our calculator example, this could be done as follows:
+
+```javascript
+
 ```

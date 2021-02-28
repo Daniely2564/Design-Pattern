@@ -1,5 +1,5 @@
 import { StackCalculator } from "./stackCalculator.js";
-import { SafeCalculator } from "./safeCalculator.js";
+import { createSafeCalculator, SafeCalculator } from "./safeCalculator.js";
 
 const calculator = new StackCalculator();
 const safeCalculator = new SafeCalculator(calculator);
@@ -18,3 +18,6 @@ safeCalculator.clear();
 safeCalculator.putValue(4);
 safeCalculator.putValue(0);
 console.log(safeCalculator.divide());
+
+/** Alternative Way using factory function */
+const safeCalculator2 = createSafeCalculator(calculator);
