@@ -208,4 +208,93 @@ const safeCalculator = patchToSafeCalculator(calculator);
 
 This technique is defintely convenient when we need to proxy only one or a few methods. Plus, we do not need to implement the _multiply()_ method and all other delegated methods.
 
-**Unfortunately**,
+**Unfortunately**, simplicity comes at the cost of having to mutate the _subject object_ directly, which can be dangerous
+
+**※ Mutation should be avoided at all costs when the subject is shared with other parts of the codebase. "Monkey patching" the subject might create undesirable side effects that affect other components of our application. The problem is that the _calculator_ instance (not safeCalculator) will also throw an error when diving by zero rather than returning _Infinity_**
+
+## The build-in Proxy object
+
+The ES2015 specification introduced a native way to create powerful proxy objects.
+
+```javascript
+const proxy = new Proxy(target, handler);
+```
+
+Target - represents the object on which the proxy is applied (the **subject** for our canonical definition).
+
+Handler - A special object that defines the behavior of the proxy.
+
+※ The _handler_ object contains a series of optional methods with predefined names called **trap methods** (for example, _apply, get, set,_ and _has_) that are automatically called when the corresponding operations are performed on the proxy instance.
+
+```javascript
+import { StackCalculator } from "./stackCalculator.js";
+
+const safeCalculatorHandler = {
+  get: (target, property) => {
+    if (property === "divide") {
+      // proxied method
+      return function () {
+        // additional validation logic
+        const divisor = target.peekValue();
+        if (divisor === 0) {
+          throw Error("Division by 0");
+        }
+        // if valid delegates to the subject
+        return target.divide();
+      };
+    }
+
+    // delegate methods and properties
+    return target[property];
+  },
+};
+
+const calculator = new StackCalculator();
+const safeCalculator = new Proxy(calculator, safeCalculatorHandler);
+```
+
+※ The **Proxy** object inherits the prototype of the subject, therefore running `safeCalculator instanceof StackCalculator` will return true.
+
+The _Proxy_ object allows us to avoid mutating the subject while giving us an easy way to proxy only the bits that we need to enhance, without having to explicitly delegate all the other properties and mthods.
+
+### Additional capabilities and limitations of the _Proxy_ object
+
+The _Proxy_ object is a feature deeply integrated into the JavaScript language itself, which enables developers to intercept and customize many operations that can be performed on objects.
+
+This characteristic opens up new and interesting scenarios that were not easily achievable before, such as _meta programming, operator overloading,_ and _object virtualization._
+
+#### Example
+
+```javascript
+const evenNumbers = new Proxy([], {
+  get: (target, index) => index * 2,
+  has: (target, number) => number % 2 === 0,
+});
+
+console.log(2 in evenNumbers); // true
+console.log(5 in evenNumbers); // false
+console.log(evenNumbers[7]); // 14
+```
+
+In this example, we are creating a virtual array that contains all even numbers. The array is considered _virtual_ because we never store data in it.
+
+The _Proxy_ object supports several other interesting traps such as _set, delete,_ and _constructs_, and allows us to create proxies that can be revoked on demand, disabling all the traps and restoring the orinal behavior of the target object.
+
+While the **Proxy** object is a powerful functionality of the JavaScript language, it suffers from a very important limitation: the Proxy object cannot be fully _transpiled_ or _polyfilled_. This is because some of the Proxy object traps can be implemented only at the runtime level and cannot be simply rewritten in plain JavaScript. This is something to be aware of if you are working with old broswers or old versions of Node.js that don't support the Proxy object directly.
+
+#### Transpilation
+
+- Short for transcompilation
+- The action of compiling source code by translating it from one source programming language to another.
+  - In the case of Javascript, this technique is used to convert a program using new capabilities of the language into an equivalent program that can also run on older runtimes that do not support these new capabilities.
+
+#### Polyfill
+
+- Code that provides an implementation for a standard API in plain JavaScript
+- can be imorted in environments where this API is not available
+  (generally older broswers or runtimes).
+  - core-js ([nodejsdp.link/corejs](nodejsdp.link/corejs)) is one of the most complete polyfill libraries for JavaScript
+
+### A comparison of the different proxying techniques
+
+Composition can be considered a simple and _safe_ way of creating a proxy because it leaves the subject untouched without mutating its original behavior.
