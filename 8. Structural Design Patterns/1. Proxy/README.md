@@ -186,5 +186,26 @@ This implementation is simpler and more concise than the class-based one, but on
 In the context of our calculator example, this could be done as follows:
 
 ```javascript
+function patchToSafeCalculator(calculator) {
+  const divideOrig = calculator.divide;
+  calculator.divide = () => {
+    //additional validation logic
+    const divisor = calculator.peekValue();
+    if (divisor === 0) {
+      throw Error("Division by 0");
+    }
+    // if valid, delegates to the subject
+    return divideOrig.apply(calculator);
+  };
 
+  return calculator;
+}
+
+const calculator = new StackCalculator();
+const safeCalculator = patchToSafeCalculator(calculator);
+//...
 ```
+
+This technique is defintely convenient when we need to proxy only one or a few methods. Plus, we do not need to implement the _multiply()_ method and all other delegated methods.
+
+**Unfortunately**,
