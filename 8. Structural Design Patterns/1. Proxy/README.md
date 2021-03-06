@@ -297,4 +297,102 @@ While the **Proxy** object is a powerful functionality of the JavaScript languag
 
 ### A comparison of the different proxying techniques
 
-Composition can be considered a simple and _safe_ way of creating a proxy because it leaves the subject untouched without mutating its original behavior.
+#### Composition
+
+**Composition** can be considered a simple and _safe_ way of creating a proxy because it leaves the subject untouched without mutating its original behavior. Its only drawback is that we have to manually delegate all the methods, even if we want to proxy only few of them.
+
+> Object properties can be delegated using **Object.defineProperty()**.
+
+#### Augmentation
+
+Modifies the subject, which might not always be ideal, but it does not suffer from the various inconveniences relatd to delegation. For this reason, between two approaches, object augmentation is generally the preferred technique in all those circumstances in which modifying the subject is an option.
+
+> There is at least one situation where composition is almost necessary; this is when we want to initialization of the subject, for example, to create it only when needed.(_lazy initialization_)
+
+#### Proxy object
+
+Is the go-to approach if you need to intercept function calls or have different types of access to object attributes, even dynamic ones. The Proxy object provides an advanced level of access control that is simply not available with the other techniques.
+
+The Proxy object does not mutate the subject, so it can be safely used in contexts where the subject is shared between different components of the application.
+
+### Creating a logging Writable stream
+
+```javascript
+export function createLoggingWritable(writable) {
+  return new Proxy(writable, {
+    get(target, propKey, receiver) {
+      if (propKey === "write") {
+        return function (...args) {
+          const [chunk] = args;
+          console.log("Writing", chunk);
+          return writable.write(...args);
+        };
+      }
+
+      return target[propKey];
+    },
+  });
+}
+```
+
+We will build an object that acts as a proxy to a **Writable** stream, which intercepts all the calls to the **write()** method and logs a message every time this happens.
+
+We created a factory that returns a proxied version of the _writable_ object passed as an argument.
+
+The proxy did not change the original interface of the stream or its external behavior but if we run the preceding code, we will not see that every chunk that is written into the **writableProxy** stream is transparently logged to the console.
+
+## Change observer with Proxy
+
+The **Change Observer pattern** is a design pattern in which an object (the subject) notifies one or more observers of any state changes, so that they can "react" to changes as soon as they happen.
+
+> The **Change Observer** pattern should not be confused with the **Observer pattern**. The **Change Observer** pattern focuses on allowing the detection of property changes, while the **Observer pattern** is a more genertic pattern that adopts an event emitter to propagate information about events happening in the system.
+
+Proxy is an effective tool to create observable objects.
+
+```javascript
+export function createObservable(target, observer) {
+  const observable = new Proxy(target, {
+    set(obj, prop, value) {
+      if (value !== obj[prop]) {
+        const prev = obj[prop];
+        obj[prop] = value;
+        observer({ prop, prev, curr: value });
+      }
+      return true;
+    },
+  });
+  return observable;
+}
+```
+
+**createObservable()** accepts a target object (the object to observe for changes) and an observer (a function to invoke every time a change is detected.)
+The proxy implements the **set** trap, which is triggered every time a property is set. The implementation compares the current value with the new one and, if they are different, the target object is mutated, and the observer gets notified.
+
+```javascript
+import { createObservable } from "./create-observable.js";
+
+function calculateTotal(invoice) {
+  return invoice.subtotal - invoice.discount + invoice.tax;
+}
+
+const invoice = {
+  subtotal: 100,
+  discount: 10,
+  tax: 20,
+};
+
+let total = calculateTotal(invoice);
+console.log(`Starting total: ${total}`);
+
+const obsInvoice = createObservable(invoice, ({ prop, prev, curr }) => {
+  total = calculateTotal(invoice);
+  console.log(`TOTAL: ${total} (${prop} changed: ${prev} -> ${curr})`);
+});
+
+obsInvoice.subtotal = 200; // TOTAL : 210
+obsInvoice.discount = 20; // TOTAL : 200
+obsInvoice.discount = 20; // no change: doesn't notify
+obsInvoice.tax = 30; // TOTAL : 210
+
+console.log(`Final total: ${total}`);
+```
