@@ -396,3 +396,16 @@ obsInvoice.tax = 30; // TOTAL : 210
 
 console.log(`Final total: ${total}`);
 ```
+
+> **Observable** are the cornerstone of **reactive programming (RP)** and **functional reactive programming (FRP)**. More about these styles of programming [nodejsdp.link/reactive-manifesto](nodejsdp.link/reactive-manifesto)
+
+### In the wild
+
+The **Proxy pattern** and more specifically the **Change Observer** pattern are widely adopted patterns. Some popular projects that take advantage of these patterns
+
+- [LoopBack](https://loopback.io/)
+  - A popular Node.js web framework that usese the Proxy pattern to provide the capability to intercept and enhance method calls on controllers. This capability can be used to build custom validation or authentication mechanisms.
+- [Vue.js Version 3](https://vuejs.org/)
+  - JavaScript reactive UI framework which has reimplemented observable properties using Proxy pattern with the Proxy object.
+- [MobX](https://mobx.js.org/README.html)
+  - Reactive state management library commonly used in frontend applications in combination with React or Vue.js.
