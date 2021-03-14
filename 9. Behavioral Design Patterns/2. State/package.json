@@ -1,0 +1,14 @@
+{
+  "name": "state-pattern",
+  "version": "1.0.0",
+  "description": "The **State** pattern is a specialization of the **Strategy pattern** where the strategy changes depending on the _state_ of the context.",
+  "main": "failsafeSocket.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "json-over-tcp-2": "^0.3.5"
+  }
+}
